@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types'
+import PropTypes, { any } from 'prop-types'
 import { Link, graphql } from 'gatsby'
+import { Slide } from 'react-slideshow-image';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from 'react-responsive-carousel';
 
 import Layout from '../components/Layout'
 import Features from '../components/Features'
 import BlogRoll from '../components/BlogRoll'
 
 export const IndexPageTemplate = ({
-  image,
+  slides,
   logoImage,
+  images,
+  properties,
   title,
   heading,
   subheading,
@@ -18,16 +23,26 @@ export const IndexPageTemplate = ({
 }) => (
   <div>
     <div
-      className="full-width-image margin-top-0"
+      className="full-width-image margin-top-0 headerContainer"
       style={{
-        backgroundImage: `url(${
-          image
-        })`,
         backgroundPosition: `top left`,
-        backgroundAttachment: `fixed`,
+        backgroundAttachment: `fixed`
       }}
     >
-       <img className={""} src={!!logoImage.childImageSharp ? logoImage.childImageSharp.fluid.src : logoImage}/>
+       <Carousel showThumbs={false} infiniteLoop dynamicHeight={true} style={{zIndex:0}} autoPlay={true}>
+          <div>
+              <img src={images[0]} />
+          </div>
+          <div>
+              <img src={images[1]} />
+          </div>
+          <div>
+              <img src={images[2]} />
+          </div>
+        </Carousel>
+       
+
+       <img className={""} src={!!logoImage.childImageSharp ? logoImage.childImageSharp.fluid.src : logoImage} style={{zIndex:1, position: "absolute"}}/>
 
     </div>
     <section className="section section--gradient">
@@ -81,9 +96,10 @@ export const IndexPageTemplate = ({
 )
 
 IndexPageTemplate.propTypes = {
-  image: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   logoImage: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   headerOne: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  images: any,
+  properties: any,
   title: PropTypes.string,
   heading: PropTypes.string,
   subheading: PropTypes.string,
@@ -92,44 +108,37 @@ IndexPageTemplate.propTypes = {
   intro: PropTypes.shape({
     blurbs: PropTypes.array,
   }),
+
 }
 
 
 
 const IndexPage = ({ data }) => {
   const { frontmatter } = data.markdownRemark
-  const [currentImage, setCurrentImage] = useState(!!frontmatter.headerOne.childImageSharp ? frontmatter.headerOne.childImageSharp.fluid.src : frontmatter.headerOne);  
 
-    useEffect(() => {
-      const images = [
-        !!frontmatter.headerOne.childImageSharp ? frontmatter.headerOne.childImageSharp.fluid.src : frontmatter.headerOne,
-        !!frontmatter.headerTwo.childImageSharp ? frontmatter.headerTwo.childImageSharp.fluid.src : frontmatter.headerTwo,
-        !!frontmatter.headerThree.childImageSharp ? frontmatter.headerThree.childImageSharp.fluid.src : frontmatter.headerThree
-      ]
-      const id = setInterval(() => {
-          console.log(currentImage);
-          switch (currentImage) {
-            case images[0]:
-               setCurrentImage(images[1]);
-               break;
-            case images[1]:
-               setCurrentImage(images[2]);
-               break;
-            case images[2]:
-               setCurrentImage(images[0]);
-            default:
-              break;
-          }
-      }, 5000);
-      return () => clearInterval(id);
-  }, [currentImage])
+  const images = [
+    !!frontmatter.headerOne.childImageSharp ? frontmatter.headerOne.childImageSharp.fluid.src : frontmatter.headerOne,
+    !!frontmatter.headerTwo.childImageSharp ? frontmatter.headerTwo.childImageSharp.fluid.src : frontmatter.headerTwo,
+    !!frontmatter.headerThree.childImageSharp ? frontmatter.headerThree.childImageSharp.fluid.src : frontmatter.headerThree
+  ]
 
+  const properties = {
+    duration: 5000,
+    transitionDuration: 500,
+    infinite: true,
+    indicators: true,
+    arrows: true,
+    onChange: (oldIndex, newIndex) => {
+      console.log(`slide transition from ${oldIndex} to ${newIndex}`);
+    }
+  }
 
   return (
     <Layout>
       <IndexPageTemplate
-        image={currentImage}
-        logoImage={frontmatter.logoImage}        
+        logoImage={frontmatter.logoImage}    
+        images={images}    
+        properties={properties}
         title={frontmatter.title}
         heading={frontmatter.heading}
         subheading={frontmatter.subheading}
