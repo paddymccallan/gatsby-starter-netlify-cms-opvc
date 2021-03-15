@@ -1,6 +1,6 @@
 ---
 templateKey: blog-post
-title: Should update straight away
+title: Should update straight away - deploy key added
 date: 2016-12-17T15:04:10.000Z
 description: >-
   The Coffee Taster’s Flavor Wheel, the official resource used by coffee
